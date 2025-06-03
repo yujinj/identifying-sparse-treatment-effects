@@ -1,0 +1,189 @@
+---
+title: "Simulations on Recovery Rates"
+author: "Yujin Jeong"
+date: "6/3/2025"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+setwd("/Users/yujin/Documents/identifying-sparse-treatment-effects")
+library(glmnet)
+library(stabs)
+library(readr)
+library(dplyr)
+library(tidyverse)
+```
+
+This function generates data $\{(X_i, T_i, Y_i)\}_{i=1}^n$ given the sample size $n$, the pre-treatment covariate dimension $m$, the outcome dimension $d$, and the treatment assignment probability $p$. 
+
+```{r}
+gen_data <- function(n, m, d, p, alphas, sigma = 1, random_seed=0){
+  set.seed(random_seed)
+  s = length(alphas)
+  # randomly generate model parameters beta and delta
+  beta = t(replicate(d, runif(m, min=-1, max=1)))
+  delta = t(replicate(s, runif(m)))
+  treatment = rbinom(n, 1, p)
+  # randomly generate X and Y
+  X = matrix(rnorm(n*m, sd=1), nrow=n, ncol=m)
+  Y = matrix(0, nrow=n, ncol=d)
+  for (i in 1:d){
+    if (i <= s) {
+      Y[,i] =  X %*% beta[i, ] + treatment * (alphas[i] + X %*% delta[i, ]) + 
+        rnorm(n, sd=sigma)
+    } else {
+      Y[,i] =  X %*% beta[i, ] + rnorm(n, sd=sigma)
+    }
+  }
+  return(list("X" = X, "Y" = Y, "treatment" = treatment))
+}
+```
+
+The following function performs subset selection using a baseline ranking-based approach combined with stability selection. You can specify the method for pre-treatment covariate adjustment as either "CUPED" or "LIN". The parameters 's_max' and 'cutoff' control the stability selection procedure: 's_max' is the maximum number of variables selected in each subsample, and 'cutoff' is the selection probability threshold for a variable to be retained in the final set. The parameter 'B' specifies the number of subsamples used in the stability selection process.
+
+```{r}
+base_method <- function(X, Y, treatment, method='CUPED', s_max=10, cutoff=0.5, B=100){
+  
+  base_method_helper <- function(X, Y, treatment, alpha=NULL, method='CUPED'){
+    
+    d = ncol(Y)
+    
+    if (method == 'CUPED'){
+      ## Using CUPED estimator
+      lm.fit = lm(Y~X) 
+      residuals = lm.fit$residuals
+      Y_control = residuals[treatment == 0, ]
+      Y_treated = residuals[treatment == 1, ]
+      cuped = sapply(1:d, function(i){t.test(Y_treated[,i], Y_control[,i], var.equal=FALSE)$statistic})
+      rank_cuped = order(abs(cuped), decreasing = TRUE)
+      return (rank_cuped)
+    }
+    
+    if (method == 'LIN') {
+      ## Using Lin's estimator
+      lm.fit.0 = lm(Y~X, subset = (treatment == 0))
+      lm.fit.1 = lm(Y~X, subset = (treatment == 1))
+      fitted.0 = predict(lm.fit.0, newdata = as.data.frame(X))
+      fitted.1 = predict(lm.fit.1, newdata = as.data.frame(X))
+      residuals = Y - mean(treatment) * fitted.0 - mean(1-treatment) * fitted.1
+      Y_control = residuals[treatment == 0, ]
+      Y_treated = residuals[treatment == 1, ]
+      lin = sapply(1:d, function(i){t.test(Y_treated[,i], Y_control[,i], var.equal=FALSE)$statistic})
+      rank_lin = order(abs(lin), decreasing = TRUE)
+      return (rank_lin)
+    }
+  }
+  
+  S = matrix(0, nrow=B, ncol=s_max)
+  for (i_b in 1:B){
+    indices = sample(1:length(treatment), length(treatment), replace=TRUE)
+    X_b = X[indices, ]
+    Y_b = Y[indices, ]
+    t_b = treatment[indices]
+    S[i_b,] = base_method_helper(X_b, Y_b, t_b, method=method)[1:s_max]
+  }
+  PI = sapply(1:ncol(Y), function(i){sum(S==i)/B})
+  return(which(PI>cutoff))
+}
+```
+
+The following function performs subset selection using the Lasso combined with stability selection. The parameters 's_max' and 'cutoff' control the stability selection procedure: 's_max' is the maximum number of variables selected in each subsample, and 'cutoff' is the selection probability threshold for a variable to be retained in the final set. 
+
+```{r}
+our_method <- function(X, Y, treatment, s_max=10, cutoff=0.5){
+  penalty = rep(1, ncol(X) + ncol(Y))
+  penalty[(ncol(Y)+1):(ncol(X)+ncol(Y))] = 0 # no penalty on X
+  weights = (length(treatment)/sum(treatment))^2 * treatment
+  weights = weights + (length(treatment)/sum(1-treatment))^2 * (1-treatment)
+  selected_set = stabsel(x = scale(cbind(Y, X), center = TRUE, scale = FALSE) * sqrt(weights), 
+                         y = (treatment-mean(treatment)) * sqrt(weights),
+                         fitfun = glmnet.lasso,
+                         args.fitfun = list(family = "gaussian",
+                                            alpha = 1, 
+                                            nlambda = 200,
+                                            penalty.factor = penalty, 
+                                            intercept = FALSE, 
+                                            standardize = FALSE),
+                         cutoff=max(cutoff, 0.8), q=ncol(X)+s_max)$selected
+  selected_set = selected_set[!(selected_set %in% ((ncol(Y)+1):(ncol(X)+ncol(Y))))]
+  return(selected_set)
+}
+```
+
+The following code runs simulations to compare the recovery rates of the baseline ranking-based subset selection method and our Lasso-based subset selection method.
+
+```{r, eval=FALSE}
+m = 50; d = 500; B = 100
+
+df = data.frame()
+n_vec = c(200, 300, 400, 500)
+pi_vec = c(0.3, 0.5, 0.7)
+alphas = c(1, 1, 1, -1, -1)
+exp_vec = seq(from = -1/2, to = -1/5, length.out = 16)
+for (pi in pi_vec){
+  for (n in n_vec) {
+    for (e in exp_vec){
+      alpha = 5*(n^(e))
+      res = matrix(0, nrow=B, ncol=3)
+      sizes = matrix(0, nrow=B, ncol=3)
+      for (i_b in 1:B){
+        data = gen_data(n, m, d, pi, alphas=alpha*alphas, sigma=1, random_seed=i_b)
+        Y = data$Y; X = data$X; treatment = data$treatment
+        s1 = base_method(X, Y, treatment, method="CUPED")
+        s2 = base_method(X, Y, treatment, method="LIN")
+        s3 = our_method(X, Y, treatment)
+        res[i_b, ] = c(sum(s1 %in% c(1,2,3,4,5))/5, 
+                       sum(s2 %in% c(1,2,3,4,5))/5, 
+                       sum(s3 %in% c(1,2,3,4,5))/5)
+        sizes[i_b, ] = c(length(s1), length(s2), length(s3))
+      }
+      sub_df = data.frame(
+        "recovery" = colMeans(res),
+        "recovery_sd" =  apply(res, 2, sd),
+        "recovery_q05" = apply(res, 2, quantile, probs=0.05),
+        "recovery_q95" = apply(res, 2, quantile, probs=0.95),
+        "size" = colMeans(sizes),
+        "size_sd" =  apply(sizes, 2, sd),
+        "method" = c(1,2,3),
+        "n" = rep(n, 3),
+        "e" = rep(e, 3),
+        "pi" = rep(pi, 3)
+      )
+      df = rbind(df, sub_df)
+    }
+  }
+}
+```
+
+The results from running the above algorithm are saved in the results_on_recovery_rates.csv file. 
+
+```{r}
+recovery_results<- read_csv("results_on_recovery_rates.csv")
+```
+
+We generate the plots shown in the paper using these results. 
+
+```{r}
+recovery_results %>%
+  mutate(method = factor(method, levels = c(1, 2, 3),
+                         labels = c("Baseline (CUPED)", "Baseline (Lin)", "Our Approach"))) %>%
+  ggplot(aes(x = e, y = recovery, color = method)) +
+    geom_line() +
+    geom_point() +
+    facet_grid(rows = vars(pi), cols = vars(n), 
+               labeller = label_both) +
+    labs(
+      title = "Recovery Rate",
+      x = expression("e (Magnitude of Treatment Effect: " * 5 * n^{e} * ")"),
+      y = "Recovery Rate",
+      color = "Approach"
+    ) +
+    scale_x_continuous(expand = expansion(mult = c(0.1, 0.1))) + 
+    scale_color_manual(values = c(
+      "Baseline (CUPED)" = "orangered2",
+      "Baseline (Lin)" = "orange1",
+      "Our Approach" = "dodgerblue3"
+    )) +
+    theme_bw() +
+    theme(legend.position = "bottom")
+```
