@@ -1,0 +1,337 @@
+"power","method","n","e","pi"
+0.016,"Multiple Testing",500,-0.4,0.5
+0.02,"Simultaneous Inference",500,-0.4,0.5
+0,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",500,-0.4,0.5
+0.056,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",500,-0.4,0.5
+0.068,"Multiple Testing",500,-0.364,0.5
+0.068,"Simultaneous Inference",500,-0.364,0.5
+0,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",500,-0.364,0.5
+0.168,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",500,-0.364,0.5
+0.204,"Multiple Testing",500,-0.333,0.5
+0.208,"Simultaneous Inference",500,-0.333,0.5
+0.032,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",500,-0.333,0.5
+0.364,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",500,-0.333,0.5
+0.432,"Multiple Testing",500,-0.308,0.5
+0.42,"Simultaneous Inference",500,-0.308,0.5
+0.104,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",500,-0.308,0.5
+0.54,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",500,-0.308,0.5
+0.636,"Multiple Testing",500,-0.286,0.5
+0.64,"Simultaneous Inference",500,-0.286,0.5
+0.244,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",500,-0.286,0.5
+0.756,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",500,-0.286,0.5
+0.804,"Multiple Testing",500,-0.267,0.5
+0.796,"Simultaneous Inference",500,-0.267,0.5
+0.4,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",500,-0.267,0.5
+0.884,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",500,-0.267,0.5
+0.896,"Multiple Testing",500,-0.25,0.5
+0.892,"Simultaneous Inference",500,-0.25,0.5
+0.532,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",500,-0.25,0.5
+0.96,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",500,-0.25,0.5
+0.056,"Multiple Testing",1000,-0.4,0.5
+0.052,"Simultaneous Inference",1000,-0.4,0.5
+0.004,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",1000,-0.4,0.5
+0.116,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",1000,-0.4,0.5
+0.188,"Multiple Testing",1000,-0.364,0.5
+0.184,"Simultaneous Inference",1000,-0.364,0.5
+0.028,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",1000,-0.364,0.5
+0.292,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",1000,-0.364,0.5
+0.38,"Multiple Testing",1000,-0.333,0.5
+0.376,"Simultaneous Inference",1000,-0.333,0.5
+0.108,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",1000,-0.333,0.5
+0.508,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",1000,-0.333,0.5
+0.576,"Multiple Testing",1000,-0.308,0.5
+0.584,"Simultaneous Inference",1000,-0.308,0.5
+0.288,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",1000,-0.308,0.5
+0.744,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",1000,-0.308,0.5
+0.792,"Multiple Testing",1000,-0.286,0.5
+0.788,"Simultaneous Inference",1000,-0.286,0.5
+0.448,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",1000,-0.286,0.5
+0.904,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",1000,-0.286,0.5
+0.92,"Multiple Testing",1000,-0.267,0.5
+0.924,"Simultaneous Inference",1000,-0.267,0.5
+0.676,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",1000,-0.267,0.5
+0.984,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",1000,-0.267,0.5
+0.984,"Multiple Testing",1000,-0.25,0.5
+0.984,"Simultaneous Inference",1000,-0.25,0.5
+0.844,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",1000,-0.25,0.5
+1,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",1000,-0.25,0.5
+0.016,"Multiple Testing",500,-0.4,0.3
+0.016,"Simultaneous Inference",500,-0.4,0.3
+0,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",500,-0.4,0.3
+0.068,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",500,-0.4,0.3
+0.084,"Multiple Testing",500,-0.364,0.3
+0.076,"Simultaneous Inference",500,-0.364,0.3
+0,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",500,-0.364,0.3
+0.164,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",500,-0.364,0.3
+0.192,"Multiple Testing",500,-0.333,0.3
+0.188,"Simultaneous Inference",500,-0.333,0.3
+0.012,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",500,-0.333,0.3
+0.324,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",500,-0.333,0.3
+0.42,"Multiple Testing",500,-0.308,0.3
+0.408,"Simultaneous Inference",500,-0.308,0.3
+0.044,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",500,-0.308,0.3
+0.528,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",500,-0.308,0.3
+0.628,"Multiple Testing",500,-0.286,0.3
+0.632,"Simultaneous Inference",500,-0.286,0.3
+0.084,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",500,-0.286,0.3
+0.744,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",500,-0.286,0.3
+0.776,"Multiple Testing",500,-0.267,0.3
+0.78,"Simultaneous Inference",500,-0.267,0.3
+0.176,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",500,-0.267,0.3
+0.868,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",500,-0.267,0.3
+0.884,"Multiple Testing",500,-0.25,0.3
+0.88,"Simultaneous Inference",500,-0.25,0.3
+0.232,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",500,-0.25,0.3
+0.936,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",500,-0.25,0.3
+0.044,"Multiple Testing",1000,-0.4,0.3
+0.04,"Simultaneous Inference",1000,-0.4,0.3
+0.004,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",1000,-0.4,0.3
+0.1,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",1000,-0.4,0.3
+0.172,"Multiple Testing",1000,-0.364,0.3
+0.164,"Simultaneous Inference",1000,-0.364,0.3
+0.008,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",1000,-0.364,0.3
+0.284,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",1000,-0.364,0.3
+0.36,"Multiple Testing",1000,-0.333,0.3
+0.348,"Simultaneous Inference",1000,-0.333,0.3
+0.044,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",1000,-0.333,0.3
+0.488,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",1000,-0.333,0.3
+0.568,"Multiple Testing",1000,-0.308,0.3
+0.568,"Simultaneous Inference",1000,-0.308,0.3
+0.136,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",1000,-0.308,0.3
+0.732,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",1000,-0.308,0.3
+0.792,"Multiple Testing",1000,-0.286,0.3
+0.792,"Simultaneous Inference",1000,-0.286,0.3
+0.3,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",1000,-0.286,0.3
+0.86,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",1000,-0.286,0.3
+0.904,"Multiple Testing",1000,-0.267,0.3
+0.9,"Simultaneous Inference",1000,-0.267,0.3
+0.496,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",1000,-0.267,0.3
+0.968,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",1000,-0.267,0.3
+0.972,"Multiple Testing",1000,-0.25,0.3
+0.976,"Simultaneous Inference",1000,-0.25,0.3
+0.696,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",1000,-0.25,0.3
+1,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",1000,-0.25,0.3
+0.02,"Multiple Testing",500,-0.4,0.7
+0.02,"Simultaneous Inference",500,-0.4,0.7
+0.004,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",500,-0.4,0.7
+0.068,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",500,-0.4,0.7
+0.096,"Multiple Testing",500,-0.364,0.7
+0.084,"Simultaneous Inference",500,-0.364,0.7
+0.008,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",500,-0.364,0.7
+0.168,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",500,-0.364,0.7
+0.208,"Multiple Testing",500,-0.333,0.7
+0.204,"Simultaneous Inference",500,-0.333,0.7
+0.036,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",500,-0.333,0.7
+0.288,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",500,-0.333,0.7
+0.352,"Multiple Testing",500,-0.308,0.7
+0.344,"Simultaneous Inference",500,-0.308,0.7
+0.092,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",500,-0.308,0.7
+0.472,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",500,-0.308,0.7
+0.568,"Multiple Testing",500,-0.286,0.7
+0.556,"Simultaneous Inference",500,-0.286,0.7
+0.156,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",500,-0.286,0.7
+0.68,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",500,-0.286,0.7
+0.732,"Multiple Testing",500,-0.267,0.7
+0.724,"Simultaneous Inference",500,-0.267,0.7
+0.244,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",500,-0.267,0.7
+0.812,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",500,-0.267,0.7
+0.848,"Multiple Testing",500,-0.25,0.7
+0.852,"Simultaneous Inference",500,-0.25,0.7
+0.352,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",500,-0.25,0.7
+0.928,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",500,-0.25,0.7
+0.036,"Multiple Testing",1000,-0.4,0.7
+0.032,"Simultaneous Inference",1000,-0.4,0.7
+0,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",1000,-0.4,0.7
+0.084,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",1000,-0.4,0.7
+0.164,"Multiple Testing",1000,-0.364,0.7
+0.152,"Simultaneous Inference",1000,-0.364,0.7
+0.004,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",1000,-0.364,0.7
+0.24,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",1000,-0.364,0.7
+0.336,"Multiple Testing",1000,-0.333,0.7
+0.332,"Simultaneous Inference",1000,-0.333,0.7
+0.044,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",1000,-0.333,0.7
+0.428,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",1000,-0.333,0.7
+0.544,"Multiple Testing",1000,-0.308,0.7
+0.532,"Simultaneous Inference",1000,-0.308,0.7
+0.124,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",1000,-0.308,0.7
+0.68,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",1000,-0.308,0.7
+0.76,"Multiple Testing",1000,-0.286,0.7
+0.76,"Simultaneous Inference",1000,-0.286,0.7
+0.3,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",1000,-0.286,0.7
+0.904,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",1000,-0.286,0.7
+0.928,"Multiple Testing",1000,-0.267,0.7
+0.924,"Simultaneous Inference",1000,-0.267,0.7
+0.45,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",1000,-0.267,0.7
+0.968,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",1000,-0.267,0.7
+0.976,"Multiple Testing",1000,-0.25,0.7
+0.976,"Simultaneous Inference",1000,-0.25,0.7
+0.672,"Multi-Sample Splitting
+with Baseline Approach
+for Subset Selection",1000,-0.25,0.7
+0.992,"Multi-Sample Splitting
+with Our Approach
+for Subset Selection",1000,-0.25,0.7

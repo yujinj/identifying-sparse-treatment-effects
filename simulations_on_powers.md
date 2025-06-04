@@ -1,0 +1,315 @@
+Simulations on Powers
+================
+Yujin Jeong
+6/3/2025
+
+This function generates data $\{(X_i, T_i, Y_i)\}_{i=1}^n$ given the
+sample size $n$, the pre-treatment covariate dimension $m$, the outcome
+dimension $d$, and the treatment assignment probability $p$.
+
+``` r
+gen_data <- function(n, m, d, p, alphas, sigma = 1, random_seed=0){
+  set.seed(random_seed)
+  s = length(alphas)
+  # randomly generate model parameters beta and delta
+  beta = t(replicate(d, runif(m, min=-1, max=1)))
+  delta = t(replicate(s, runif(m)))
+  treatment = rbinom(n, 1, p)
+  # randomly generate X and Y
+  X = matrix(rnorm(n*m, sd=1), nrow=n, ncol=m)
+  Y = matrix(0, nrow=n, ncol=d)
+  for (i in 1:d){
+    if (i <= s) {
+      Y[,i] =  X %*% beta[i, ] + treatment * (alphas[i] + X %*% delta[i, ]) + 
+        rnorm(n, sd=sigma)
+    } else {
+      Y[,i] =  X %*% beta[i, ] + rnorm(n, sd=sigma)
+    }
+  }
+  return(list("X" = X, "Y" = Y, "treatment" = treatment))
+}
+```
+
+This function performs subset selection using a baseline ranking-based
+approach. For more details, see the accompanying file
+simulations_on_recovery_rates.Rmd. The additional parameter ‘s_min’
+specifies the minimum number of dimensions to be selected during subset
+selection.
+
+``` r
+base_method <- function(X, Y, treatment, method='LIN', s_min=1, s_max=10, cutoff=0.5, B=100){
+  
+  base_method_helper <- function(X, Y, treatment, alpha=NULL, method='CUPED'){
+    
+    d = ncol(Y)
+    
+    if (method == 'CUPED'){
+      ## Using CUPED estimator
+      lm.fit = lm(Y~X) 
+      residuals = lm.fit$residuals
+      Y_control = residuals[treatment == 0, ]
+      Y_treated = residuals[treatment == 1, ]
+      cuped = sapply(1:d, function(i){t.test(Y_treated[,i], Y_control[,i], var.equal=FALSE)$statistic})
+      rank_cuped = order(abs(cuped), decreasing = TRUE)
+      return (rank_cuped)
+    }
+    
+    if (method == 'LIN') {
+      ## Using Lin's estimator
+      lm.fit.0 = lm(Y~X, subset = (treatment == 0))
+      lm.fit.1 = lm(Y~X, subset = (treatment == 1))
+      fitted.0 = predict(lm.fit.0, newdata = as.data.frame(X))
+      fitted.1 = predict(lm.fit.1, newdata = as.data.frame(X))
+      residuals = Y - mean(treatment) * fitted.0 - mean(1-treatment) * fitted.1
+      Y_control = residuals[treatment == 0, ]
+      Y_treated = residuals[treatment == 1, ]
+      lin = sapply(1:d, function(i){t.test(Y_treated[,i], Y_control[,i], var.equal=FALSE)$statistic})
+      rank_lin = order(abs(lin), decreasing = TRUE)
+      return (rank_lin)
+    }
+  }
+  
+  S = matrix(0, nrow=B, ncol=s_max)
+  for (i_b in 1:B){
+    indices = sample(1:length(treatment), length(treatment), replace=TRUE)
+    X_b = X[indices, ]
+    Y_b = Y[indices, ]
+    t_b = treatment[indices]
+    S[i_b,] = base_method_helper(X_b, Y_b, t_b, method=method)[1:s_max]
+  }
+  PI = sapply(1:ncol(Y), function(i){sum(S==i)/B})
+  selected_set = which(PI>cutoff)
+  if (length(selected_set)<s_min) {
+    selected_set = order(PI, decreasing=TRUE)[1:s_min]
+  }
+  return(selected_set)
+}
+```
+
+This function performs subset selection using our proposed approach. For
+more details, see the accompanying file
+simulations_on_recovery_rates.Rmd. The additional parameter ‘s_min’
+specifies the minimum number of dimensions to be selected during subset
+selection.
+
+``` r
+our_method <- function(X, Y, treatment, s_min=1, s_max=10, cutoff=0.5){
+  penalty = rep(1, ncol(X) + ncol(Y))
+  penalty[(ncol(Y)+1):(ncol(X)+ncol(Y))] = 0 # no penalty on X
+  weights = (length(treatment)/sum(treatment))^2 * treatment
+  weights = weights + (length(treatment)/sum(1-treatment))^2 * (1-treatment)
+  stabsel_res = stabsel(x = scale(cbind(Y, X), center = TRUE, scale = FALSE) * sqrt(weights), 
+                        y = (treatment-mean(treatment)) * sqrt(weights),
+                        fitfun = glmnet.lasso,
+                        args.fitfun = list(family = "gaussian",
+                                           alpha = 1, 
+                                           nlambda = 200,
+                                           penalty.factor = penalty, 
+                                           intercept = FALSE, 
+                                           standardize = FALSE),
+                         cutoff=max(cutoff, 0.6), q=ncol(X)+s_max)
+  selected_set = which(stabsel_res$max[1:ncol(Y)]>=cutoff)
+  if (length(selected_set)<s_min){
+    selected_set = order(stabsel_res$max[1:ncol(Y)], decreasing=TRUE)[1:s_min]
+  }
+  return(selected_set)
+}
+```
+
+The following function performs multiple testing and returns significant
+dimensions.
+
+``` r
+multiple_testing <- function(X, Y, treatment){
+  
+  ## Using Lin's estimator
+  lm.fit.0 = lm(Y~X, subset = (treatment == 0))
+  lm.fit.1 = lm(Y~X, subset = (treatment == 1))
+  fitted.0 = predict(lm.fit.0, newdata = as.data.frame(X))
+  fitted.1 = predict(lm.fit.1, newdata = as.data.frame(X))
+  residuals = Y - sum(treatment)/length(treatment) * fitted.0 - sum(1-treatment)/length(treatment) * fitted.1
+  Y_control = residuals[treatment == 0, ]
+  Y_treated = residuals[treatment == 1, ]
+  
+  d = ncol(Y)
+  pvalues = sapply(1:ncol(Y), function(i){
+    min(t.test(Y_treated[,i], Y_control[,i], var.equal=FALSE)$p.value*d, 1)})
+  
+  return (which(pvalues<0.05))
+}
+```
+
+The following function performs simultaneous inference and returns
+significant dimensions.
+
+``` r
+psi <- function(X, Y, treatment, B=1000){
+  
+  ## Get Influence Function
+  lm.fit.0 = lm(Y~X, subset = (treatment == 0))
+  lm.fit.1 = lm(Y~X, subset = (treatment == 1))
+  fitted.0 = predict(lm.fit.0, newdata = as.data.frame(X))
+  fitted.1 = predict(lm.fit.1, newdata = as.data.frame(X))
+  Y_tilde = Y - mean(treatment) * fitted.0 - mean(1-treatment) * fitted.1
+  psi = treatment * Y_tilde / mean(treatment) - (1-treatment) * Y_tilde / mean(1-treatment)
+  psi_scaled = scale(psi, center=TRUE, scale=TRUE)
+  
+  set.seed(0)
+  n = nrow(X)
+  E = matrix(rnorm(n*B), nrow=n, ncol=B)
+  S = (t(psi_scaled) %*% E)/n
+  S = apply(S, 2, function(v) max(abs(v)))
+  q = quantile(S, 0.95)
+  
+  tau = colMeans(scale(psi, center=FALSE, scale=TRUE))
+  return(which(abs(tau) > q))
+}
+```
+
+The following functions performs multi-sample splitting procedure with a
+choice of subset selection method. Set ‘func = base_method’ to use the
+baseline ranking-based approach, or ‘func = our_method’ to use the
+proposed Lasso-based method. The arguments ‘s_min’, ‘s_max’, and
+‘cutoff’ are passed to the chosen subset selection method. The argument
+‘p2’ specifies the proportion of the sample allocated to the second
+split for effect estimation, and B is the number of multi-splits used in
+the procedure. The function outputs significant dimensions.
+
+``` r
+multi_sample_splitting <- function(X, Y, treatment, func,
+                                   s_min=1, s_max=10, cutoff=0.5, p2=0.6, B=100){
+  n = nrow(X); d = ncol(Y)
+  n1=n*(1-p2)
+  
+  evaluate_on_the_second_split <- function(X, Y, treatment, selected_set){
+    
+    lm.fit.0 = lm(Y~X, subset = (treatment == 0))
+    lm.fit.1 = lm(Y~X, subset = (treatment == 1))
+    fitted.0 = predict(lm.fit.0, newdata = as.data.frame(X))
+    fitted.1 = predict(lm.fit.1, newdata = as.data.frame(X))
+    residuals = Y - mean(treatment) * fitted.0 - mean(1-treatment) * fitted.1
+    Y_control = residuals[treatment == 0, ]
+    Y_treated = residuals[treatment == 1, ]
+  
+    pvalues = rep(1, ncol(Y))
+    for (s in selected_set){
+      pvalues[s] = t.test(Y_treated[,s], Y_control[,s], var.equal=FALSE)$p.value * length(selected_set)
+    }
+    return (pvalues)
+  }
+  
+  pvalues = matrix(1, nrow = B, ncol = d)
+  for (i_b in 1:B){
+    set.seed(i_b)
+    indices = sample(1:n, n, replace=FALSE)
+    first_split = indices[1:n1]; second_split = indices[(n1+1):n]
+    selected_set = func(X[first_split, ], Y[first_split, ], 
+                        treatment[first_split], 
+                        s_min=s_min, s_max=s_max, cutoff=cutoff)
+    pvalues[i_b,] = evaluate_on_the_second_split(X[second_split, ], Y[second_split, ], 
+                                                 treatment[second_split], 
+                                                 selected_set = selected_set)
+  }
+  selected_set_f = which(apply(pvalues, 2, function(x) {min(quantile(x, 0.1) * 10, 1)}) < 0.05)
+  return (selected_set_f)
+}
+```
+
+The following code runs simulations to compare powers of the following
+methods: 1) multiple testing, 2) simultaneous inference, 3) multi-sample
+splitting with baseline ranking-based subset selection method, and 4)
+multi-sample splitting with our subset selection method using the Lasso.
+
+``` r
+d = 500; m = 50; B = 50
+
+df = data.frame()
+n_vec = c(500)
+pi_vec = c(0.3, 0.5, 0.7)
+alphas = c(1, 1, 1, -1, -1)
+exp_vec = c(-1/2.5, -1/2.75, -1/3, -1/3.25, -1/3.5, -1/3.75, -1/4)
+exp_vec = c(-1/3.5)
+for (pi in pi_vec){
+  for (n in n_vec) {
+    for (e in exp_vec){
+      alpha = 5*(n^(e))
+      res = matrix(0, nrow=B, ncol=4)
+      sizes = matrix(0, nrow=B, ncol=4)
+      for (i_b in 1:B){
+        data = gen_data(n, m, d, pi, alphas=alpha*alphas, sigma=1, random_seed=i_b)
+        Y = data$Y; X = data$X; treatment = data$treatment
+        s1 = multiple_testing(X, Y, treatment)
+        s2 = psi(X, Y, treatment)
+        s3 = multi_sample_splitting(X, Y, treatment, base_method, cutoff=0.4)
+        s4 = multi_sample_splitting(X, Y, treatment, our_method, cutoff=0.4)
+        res[i_b, ] = c(sum(s1 %in% c(1,2,3,4,5))/5, sum(s2 %in% c(1,2,3,4,5))/5, 
+                       sum(s3 %in% c(1,2,3,4,5))/5, sum(s4 %in% c(1,2,3,4,5))/5)
+        sizes[i_b, ] = c(length(s1), length(s2), length(s3), length(s4))
+      }
+      sub_df = data.frame(
+        "power" = colMeans(res),
+        "method" = c(1,2,3,4),
+        "n" = rep(n, 4),
+        "e" = rep(e, 4),
+        "pi" = rep(pi, 4)
+      )
+      df = rbind(df, sub_df)
+    }
+  }
+}
+```
+
+The results from running the above algorithm are saved in the
+results_on_powers.csv file.
+
+``` r
+power_results<- read_csv("results_on_powers.csv")
+```
+
+    ## Rows: 168 Columns: 5
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (1): method
+    ## dbl (4): power, n, e, pi
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+We generate the plots shown in the paper using these results.
+
+``` r
+ggplot(power_results, aes(x = e, y = power, color = method, linewidth=method)) +
+  geom_line() +
+  geom_point() +
+  facet_grid(rows = vars(n), cols = vars(pi),
+             labeller = label_both) +
+  labs(
+    x = expression("e (Magnitude of Treatment Effect: " * 5 * n^{e} * ")"),
+    y = "True Positive Rate",
+    color = "Method",
+  ) +
+  scale_linewidth_manual(values = c(
+    "Multiple Testing" = 2,
+    "Simultaneous Inference" = 1,
+    "Multi-Sample Splitting\nwith Baseline Approach\nfor Subset Selection" = 1,
+    "Multi-Sample Splitting\nwith Our Approach\nfor Subset Selection" = 1
+  )) +
+  scale_color_manual(values = c(
+    "Multiple Testing" = "orangered2",
+    "Simultaneous Inference" = "orange1",
+    "Multi-Sample Splitting\nwith Baseline Approach\nfor Subset Selection" = "forestgreen",
+    "Multi-Sample Splitting\nwith Our Approach\nfor Subset Selection" = "dodgerblue3"
+  )) +
+  guides(linewidth = "none") +
+  scale_x_continuous(expand = expansion(mult = c(0.05, 0.05))) +
+  theme_bw() +
+  theme(
+    legend.position = "right",
+    legend.spacing.y = unit(8, "pt"),  # Increase vertical space between legend items
+    legend.text = element_text(size=10, margin = margin(b = 6)),  # Optional: extra bottom margin
+    axis.title.x = element_text(margin = margin(t = 14)),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+```
+
+![](simulations_on_powers_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
