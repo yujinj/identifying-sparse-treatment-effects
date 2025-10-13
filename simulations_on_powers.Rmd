@@ -1,6 +1,5 @@
 ---
 title: "Simulations on Powers"
-date: "6/3/2025"
 output: github_document
 ---
 
