@@ -1,7 +1,5 @@
 Simulations on Recovery Rates
 ================
-Yujin Jeong
-6/3/2025
 
 This function generates data $\{(X_i, T_i, Y_i)\}_{i=1}^n$ given the
 sample size $n$, the pre-treatment covariate dimension $m$, the outcome
